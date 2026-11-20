@@ -1,0 +1,14 @@
+{
+  "name": "raymanguino",
+  "owner": {
+    "name": "Ray Manguino",
+    "url": "https://github.com/raymanguino"
+  },
+  "plugins": [
+    {
+      "name": "agentic-workflow",
+      "source": "./",
+      "description": "Subagents and orchestrator skills that take a GitHub epic, issue or batch of dependency PRs to reviewed pull requests, with human approval at every checkpoint"
+    }
+  ]
+}
