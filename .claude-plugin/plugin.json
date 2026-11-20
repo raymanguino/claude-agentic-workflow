@@ -14,5 +14,6 @@
     "worktrees",
     "code-review",
     "dependabot"
-  ]
+  ],
+  "license": "MIT"
 }
