@@ -1,12 +1,18 @@
 {
   "name": "agentic-workflow",
   "displayName": "Agentic Workflow",
-  "version": "0.1.0",
   "description": "Subagents and orchestrator skills that take a GitHub epic, issue or batch of dependency PRs to reviewed pull requests, with human approval at every checkpoint",
   "author": {
     "name": "Ray Manguino",
     "url": "https://ray-manguino.dev"
   },
   "repository": "https://github.com/raymanguino/claude-agentic-workflow",
-  "keywords": ["github", "orchestration", "subagents", "worktrees", "code-review", "dependabot"]
+  "keywords": [
+    "github",
+    "orchestration",
+    "subagents",
+    "worktrees",
+    "code-review",
+    "dependabot"
+  ]
 }
