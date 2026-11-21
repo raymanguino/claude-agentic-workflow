@@ -59,7 +59,8 @@ An epic's issues are its GitHub sub-issues (parent/child links). They are the on
    - issues that add DB migrations (keep them in separate waves to avoid migration numbering collisions)
 3. Group the issues into **waves**, with at most 3 issues per wave. Every issue in a wave depends only on earlier waves.
 4. Give each issue a **model**: `sonnet` by default, and `opus` for complex work (new architecture, migrations, tricky retrieval, data-consistency or concurrency logic). Add a one-line reason.
-5. Show the plan as a table: wave · issue · title · depends on · base branch · model · reason. Then **stop and ask for approval**. The user may reorder, change models, or limit scope. With `--plan-only`, end here.
+5. **Size:** if the project's CLAUDE.md names a PR size check, judge whether each issue fits one PR under that budget. When one clearly will not, say so in the plan and propose splitting that issue into smaller sub-issues of the epic, placed in later waves as their dependencies require, before anything is implemented; splitting a plan is far cheaper than splitting a finished branch.
+6. Show the plan as a table: wave · issue · title · depends on · base branch · model · size estimate (when there is a size check) · reason. Then **stop and ask for approval**. The user may reorder, change models, or limit scope. With `--plan-only`, end here.
 
 ## 2. Run a wave
 For each approved issue in the current wave, start an `issue-implementer` subagent **in the background, all in one message**:
@@ -73,9 +74,14 @@ Don't poll. You'll be notified as each one finishes.
 1. If its checks failed or it reported blockers, note them and skip straight to the checkpoint for that issue.
 2. Start `code-reviewer` and `security-auditor` **in parallel**, passing the implementer's exact absolute changed-file paths and the issue's goal. Also start `code-improver` if the change is large (roughly 300+ changed lines or 10+ files).
 3. Collect the High and Critical findings, plus Medium findings that are clearly correct. Send them back to **the same implementer** with SendMessage. Repeat the review at most twice. Note anything still unresolved.
+4. **Size check.** If the project's CLAUDE.md names a PR size check (a command that measures a branch against the PR reviewer's diff budget), run it in the implementer's worktree against the issue's base branch after the last fix round, since fixes add lines. Keep its verdict and, when over, the files it says the reviewer would miss. Without such a check, skip this step.
 
 ## 4. Checkpoint (after the whole wave is done)
-1. Summarize each issue: branch, commits, checks, review findings (fixed / remaining), and open questions.
+1. Summarize each issue: branch, commits, checks, review findings (fixed / remaining), size check result, and open questions.
+   If the size check reported **over budget**, do not offer a plain push. Give the user three options:
+   - **Split (recommended).** Propose stacked PRs along the change's natural seams (for example schema and migrations → services → routes → frontend → docs; tests stay with the code they test), list the files in each part, and say whether each part would fit. On approval, create one sub-issue per part (`gh issue create`, then `gh issue edit <epic> --add-sub-issue <new>`, so they join the epic; the original issue's PR is replaced by theirs, so ask whether to close it or keep it as their parent), then SendMessage **the same implementer** to rebuild its work as stacked branches, one per part, each based on the one before. It must not rewrite or delete the original branch. Run the size check on each new branch against its own base, then continue the checkpoint with one PR per part.
+   - **Push as is.** Add a section to the PR body saying the change is over the review budget and why it cannot be split, and list the files the reviewer should read first.
+   - **Stop** and leave the branch for the user.
 2. **Ask before pushing.** On approval, for each issue:
    - `git push -u origin <branch>`
    - `gh pr create --base <base> --head <branch>`, with a body that includes `Closes #N`, a short summary, the test results, and `Part of #<epic>`
