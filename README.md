@@ -40,6 +40,7 @@ Every skill takes `-h` for its options.
 - **Human approval at the points that are hard to undo:** the plan, each push and PR, and each next wave. The orchestrators never merge their own work, force-push, reset or delete branches. The one exception is the cleanup script, which deletes only merged `worktree-agent-*` branches with `git branch -d`.
 - **Least privilege per agent:** reviewers can only read; the implementer edits and runs checks only inside its own worktree, and never pushes.
 - **Bounded loops:** at most three issues per wave and two review-fix rounds. An agent that goes off scope or stalls is stopped and reported, not retried.
+- **PRs sized for review (opt-in):** if a project's CLAUDE.md names a PR size check (a command that measures a branch against the PR reviewer's diff budget), the orchestrators plan splits for issues that will not fit, run the check before each push, and offer to split an over-budget branch into stacked PRs instead of pushing it whole.
 - **Untrusted input stays data:** PR bodies, release notes and CI logs are never followed as instructions.
 
 A setup that works well with this: run the orchestration as a separate bot GitHub account, so the bot opens PRs and you approve them from your own account. That satisfies a one-approval branch rule without approving your own work, and a bot token without `workflow` scope means an agent can't change your CI.
